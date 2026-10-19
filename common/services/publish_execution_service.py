@@ -256,10 +256,10 @@ async def execute_single_publish(
                 static_root=static_root,
             )
         else:
-            # 普通卖家单品发布不提供视频能力，后端兜底丢弃绕过前端提交的视频。
+            # 普通卖家（个人）发布同样支持视频：个人发布器会按前端提交的视频上传并带上，
+            # 这里不再丢弃，仅按个人卖家规范覆盖库存字段。
             personal_item_data = {
                 **publish_item_data,
-                "videos": [],
                 "quantity": PERSONAL_SELLER_DEFAULT_STOCK,
                 "stock": PERSONAL_SELLER_DEFAULT_STOCK,
             }

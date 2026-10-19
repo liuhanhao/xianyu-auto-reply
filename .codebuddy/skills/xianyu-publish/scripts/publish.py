@@ -74,9 +74,24 @@ def upload_image(secret_key: str, account_id: str, path: Path) -> str:
         return call("/external/publish/media", form=form, files=files)["media_id"]
 
 
-def resolve_images(raw_images: list[str], base_dir: Path) -> list[Path]:
+def upload_media(secret_key: str, account_id: str, path: Path, media_type: str) -> str:
+    """上传 image 或 video，返回 media_id。"""
+    mime = mimetypes.guess_type(path.name)[0] or (
+        "image/jpeg" if media_type == "image" else "video/mp4"
+    )
+    with path.open("rb") as handle:
+        files = {"file": (path.name, handle, mime)}
+        form = {"secret_key": secret_key, "account_id": account_id, "media_type": media_type}
+        return call("/external/publish/media", form=form, files=files)["media_id"]
+
+
+def upload_video(secret_key: str, account_id: str, path: Path) -> str:
+    return upload_media(secret_key, account_id, path, "video")
+
+
+def _resolve_paths(raw_media: list[str], base_dir: Path, *, max_count: int, kind: str) -> list[Path]:
     paths: list[Path] = []
-    for raw in raw_images or []:
+    for raw in raw_media or []:
         text = str(raw or "").strip()
         if not text:
             continue
@@ -84,22 +99,37 @@ def resolve_images(raw_images: list[str], base_dir: Path) -> list[Path]:
         if not path.is_absolute():
             path = base_dir / path
         if not path.is_file():
-            fail(f"图片不存在：{path}")
+            fail(f"{kind}不存在：{path}")
         paths.append(path)
-    if not paths:
-        fail("images 至少需要一张本地图片路径")
-    if len(paths) > 9:
-        fail(f"images 最多 9 张，当前 {len(paths)} 张")
+    if len(paths) > max_count:
+        fail(f"{kind}最多 {max_count} 个，当前 {len(paths)} 个")
     return paths
 
 
-def build_item(config: dict, candidate: dict, media_ids: list[str]) -> dict:
+def resolve_images(raw_images: list[str], base_dir: Path) -> list[Path]:
+    paths = _resolve_paths(raw_images, base_dir, max_count=9, kind="图片")
+    if not paths:
+        fail("images 至少需要一张本地图片路径")
+    return paths
+
+
+def resolve_videos(raw_videos: list[str], base_dir: Path) -> list[Path]:
+    return _resolve_paths(raw_videos, base_dir, max_count=3, kind="视频")
+
+
+def build_item(
+    config: dict,
+    candidate: dict,
+    media_ids: list[str],
+    video_media_ids: list[str] | None = None,
+) -> dict:
     item = {
         "title": str(config["title"]).strip(),
         "description": str(config["description"]).strip(),
         "price": float(config["price"]),
         "address": str(config["address"]).strip(),
         "image_media_ids": media_ids,
+        "video_media_ids": video_media_ids or [],
         "quantity": int(config.get("quantity") or 1),
         "shipping_method": str(config.get("shipping_method") or "free").strip(),
         "postage": float(config.get("postage") or 0),
@@ -164,6 +194,7 @@ def main() -> None:
         fail("price 必须大于 0")
 
     images = resolve_images(config.get("images"), config_path.parent)
+    videos = resolve_videos(config.get("videos"), config_path.parent)
 
     candidates = recommend_category(
         secret_key,
@@ -180,9 +211,10 @@ def main() -> None:
     print_candidates(candidates, chosen_index)
 
     media_ids = [upload_image(secret_key, account_id, path) for path in images]
-    print(f"已上传 {len(media_ids)} 张图片")
+    video_media_ids = [upload_video(secret_key, account_id, path) for path in videos]
+    print(f"已上传 {len(media_ids)} 张图片、{len(video_media_ids)} 个视频")
 
-    item = build_item(config, candidate, media_ids)
+    item = build_item(config, candidate, media_ids, video_media_ids)
 
     if args.dry_run:
         print("预览（未发布）：")
@@ -190,6 +222,7 @@ def main() -> None:
         print(f"  标题    {item['title']}")
         print(f"  售价    {item['price']}")
         print(f"  所在地  {item['address']}")
+        print(f"  视频    {len(item.get('video_media_ids') or [])} 个")
         print(f"  分类    {item.get('platform_category_name') or '(未识别)'}")
         return
 

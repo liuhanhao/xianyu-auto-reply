@@ -1,0 +1,48 @@
+# 闲鱼商品发布配置（草稿，未发布）
+# 填写下面 3 个空值后即可发布：secret_key / account_id / address
+
+secret_key: "iJlUjakzVlv9X0vXGyasDfdrPcTvihe0"          # 客户端「个人设置」页的「分销秘钥」
+account_id: "609853695"          # 不知道就留空跑一次，脚本会列出账号
+
+title: "清仓7寸方灯LED大灯 远近光天使眼 牧马人切诺基皮卡"
+
+description: |
+  【公司破产 大甩卖】全新 LED 7 寸方灯，远近光 + 天使眼日行灯，铝壳散热。
+
+  原厂拿货价 170/只（含税），公司清算，全部 120 包邮出，一只也是批发价，能回点血是一点。
+
+  【参数】
+  型号：LWL05（工厂型号 HP-GZD-381-01）
+  尺寸：7 寸方灯位
+  功率：25W / 40W
+  色温：6500K 白光
+  外壳：黑色铝合金，背部鳍片散热
+  功能：远光 / 近光 / 天使眼（上下两条灯带）
+  成色：全新未拆，原厂吸塑盒包装
+
+  【适配车型】
+  牧马人、切诺基 YJ、皮卡、海拉克斯、陆迪、斯太尔、老克等 7 寸方灯位老车改装。
+
+  【价格】
+  标价 120 包邮，单只可小刀，量大更优。多只需要直接聊。
+
+  【发货】
+  现货，拍下当天或次日发出。走平台交易，有问题先沟通。
+
+  【说明】
+  实物拍摄，包装轻微压痕不影响使用。安装孔位和尺寸以实物为准。
+
+price: 120
+address: "广东 佛山"             # 宝贝所在地，如「广东 佛山」
+quantity: 50            # 按实际可售数量改
+
+images:
+  - /Users/juanrmbp14/Desktop/乒乓球灯/pic.jpg
+  - /Users/juanrmbp14/Desktop/乒乓球灯/实拍_正面.jpg
+  - /Users/juanrmbp14/Desktop/乒乓球灯/实拍_背面散热.jpg
+  - /Users/juanrmbp14/Desktop/乒乓球灯/实拍_接线.jpg
+
+shipping_method: free
+postage: 0
+
+category_index: 1
