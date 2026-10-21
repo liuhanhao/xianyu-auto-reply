@@ -30,6 +30,9 @@ CodeBuddy CLI → OpenAI-compatible /v1/chat/completions proxy
     3) python3 codebuddy_proxy.py --serve-url http://127.0.0.1:3300
        启动本代理，监听 127.0.0.1:3200。
 
+    bash local_start.sh restart
+    bash local_start.sh start
+
 用法:
     python3 codebuddy_proxy.py                    # 默认监听 127.0.0.1:3200，连 3300 的 serve
     python3 codebuddy_proxy.py --serve-url http://127.0.0.1:3300
